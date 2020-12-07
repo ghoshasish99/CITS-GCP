@@ -8,4 +8,5 @@ Projects/*/Results/*/
 web/
 recent.items
 log.txt
+.gitignore
 
