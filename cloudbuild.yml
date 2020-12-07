@@ -1,0 +1,23 @@
+steps:
+# Build a docker image
+ - name: 'gcr.io/cloud-builders/docker'
+   args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/testautomation', '--cache-from', 'gcr.io/$PROJECT_ID/testautomation', '.' ]
+# Push the docker image to container registry
+ - name: 'gcr.io/cloud-builders/docker'
+   args: ["push", "gcr.io/$PROJECT_ID/testautomation"]
+# Pull the docker image from container registry to execute the tests
+ - name: 'docker/compose:1.15.0'
+   args: ['run', 'automation']
+   env:
+    - 'PROJECT_ID=$PROJECT_ID'
+    - 'PROJECT_NAME=${_PROJ}'
+    - 'RELEASE_NAME=${_RELEASE}'
+    - 'TESTSET_NAME=${_TESTSET}'
+    - 'GRID_URL=${_GRIDURL}'   
+# Store the Test Results in cloud storage      
+artifacts:
+  objects:
+    location: 'gs://testautomationbuildartifacts/ExecutionResults'
+    paths: ['Results/Latest/*.txt','Results/Latest/summary.html']  
+images:
+ - 'gcr.io/$PROJECT_ID/testautomation'
